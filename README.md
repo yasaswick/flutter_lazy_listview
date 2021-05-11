@@ -9,6 +9,12 @@
 
 A light-weight minimalist dart packackage for lazy loading of infinite lists.. (packed with some cool features) Uses dart streams and sliverlists under-the-hood.
 
+## Screenshot
+  
+  <p align="center"><img  src="https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/gif.gif" alt="Screenshot" />
+
+  
+
 ## Usage
 
 ```dart
