@@ -4,21 +4,39 @@ part of flutter_lazy_listview;
 typedef Widget ItemBuilder<T>(BuildContext context, T data, int index);
 
 class FlutterLazyListView<T> extends StatefulWidget {
-  //data feed controller
+  ///Data feed controller
+  ///
+  ///[DataFeedController] of generic type
   final DataFeedController<T> dataFeedController;
-  //item builder
+
+  ///Item builder
+
   final ItemBuilder<T> itemBuilder;
-  //future
+
+  ///Async method to load next page when end is reached
   final Function onReachingEnd;
-  //offset
+
+  ///Offset to use to trigger [onReachEnd] method
   final double offset;
-  //final progress builder;
+
+  ///Progress builder;
+  ///
+  ///Widget which is displayed while the async[onReachEnd] is awaiting
   final Widget progressBuilder;
-  //final error builder;
+
+  ///Error Widget builder;
+  ///
+  ///Widget which is displayed when there is an error is stream builder
   final Widget errorBuilder;
-  //final empty list builder
+
+  ///Empty list widget builder
+  ///
+  ///Widget which is displayed when list is empty
   final Widget emptyListBuilder;
-  //final empty list builder
+
+  ///No data widget builder
+  ///
+  ///Widget which is displayed when no data is present
   final Widget noDataBuilder;
 
   const FlutterLazyListView(
@@ -43,57 +61,59 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        child: StreamBuilder<List<T>>(
-            stream: widget.dataFeedController.dataFeedStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var data = snapshot.data;
-                if (data.isEmpty) {
-                  return widget.emptyListBuilder ??
-                      Center(child: Text('Empty List'));
-                } else {
-                  return NotificationListener<ScrollNotification>(
-                    onNotification: (info) => _onNotification(info),
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return _itemBuilder(context, data[index], index);
-                            },
-                            childCount: snapshot.data.length,
-                          ),
-                        ),
-                        SliverToBoxAdapter(
-                          child: StreamBuilder(
-                              initialData: ConnectionStatus.COMPLETED,
-                              stream: widget.dataFeedController.statusStream,
-                              builder: (context, snapshot) {
-                                switch (snapshot.data) {
-                                  case ConnectionStatus.BUSY:
-                                    return widget.progressBuilder ??
-                                        CupertinoActivityIndicator();
-                                    break;
-                                  default:
-                                    return Container();
-                                }
-                              }),
-                        )
-                      ],
-                    ),
-                  );
-                }
-              } else {
-                // _loadData();
+    return Container(
+      child: StreamBuilder<List<T>>(
+          stream: widget.dataFeedController.dataFeedStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var data = snapshot.data;
+              if (data.isEmpty) {
                 return widget.emptyListBuilder ??
-                    Center(
-                      child: widget.noDataBuilder ?? Text('No data'),
-                    );
+                    Center(child: Text('Empty List'));
+              } else {
+                return NotificationListener<ScrollNotification>(
+                  onNotification: (info) => _onNotification(info),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            return _itemBuilder(context, data[index], index);
+                          },
+                          childCount: snapshot.data.length,
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: StreamBuilder(
+                            initialData: ConnectionStatus.COMPLETED,
+                            stream: widget.dataFeedController.statusStream,
+                            builder: (context, snapshot) {
+                              switch (snapshot.data) {
+                                case ConnectionStatus.BUSY:
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 25),
+                                    child: widget.progressBuilder ??
+                                        CupertinoActivityIndicator(),
+                                  );
+                                  break;
+                                default:
+                                  return Container();
+                              }
+                            }),
+                      )
+                    ],
+                  ),
+                );
               }
-            }),
-      ),
+            } else {
+              // _loadData();
+              return widget.emptyListBuilder ??
+                  Center(
+                    child: widget.noDataBuilder ?? Text('No data'),
+                  );
+            }
+          }),
     );
   }
 

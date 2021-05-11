@@ -6,3 +6,4 @@ import 'package:flutter/material.dart';
 
 part 'src/widget/lazy_list_view.dart';
 part 'src/controller/data_controller.dart';
+part 'src/model/enums.dart';
