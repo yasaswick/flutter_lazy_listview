@@ -2,7 +2,10 @@
 
   
 
-<p  align="center"><img  src="https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/logo.png"  height="110"  alt="Logo" />
+<p  align="center"><img  src="https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/logo.png"  height="250"  alt="Logo" />
+
+[![Build Actions Status](https://github.com/yasaswick/flutter_lazy_listview/workflows/Dart/badge.svg)](https://github.com/yasaswick/flutter_lazy_listview/actions)
+
 
 A light-weight minimalist dart packackage for lazy loading of infinite lists.. (packed with some cool features) Uses dart streams and sliverlists under-the-hood.
 
