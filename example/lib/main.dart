@@ -48,7 +48,9 @@ class _FlutterLazyListViewExampleState
   @override
   void initState() {
     super.initState();
-    _addDummyMessages();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _addDummyMessages();
+    });
   }
 
   @override
@@ -58,8 +60,11 @@ class _FlutterLazyListViewExampleState
         child: Column(
           children: [
             Expanded(
-              child: FlutterLazyListView<Message>(
+              child: FlutterLazyListView<Message>.separated(
                 dataFeedController: _controller,
+                onRefresh: () async {
+                  await Future.delayed(Duration(seconds: 2));
+                },
                 noDataBuilder: Container(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -92,6 +97,13 @@ class _FlutterLazyListViewExampleState
                           _controller.replaceData(
                               d, m.copyWith(isFav: !m.isFav));
                         }),
+                  );
+                },
+                separatorBuilder:
+                    (BuildContext context, Message data, int index) {
+                  return Divider(
+                    thickness: 1,
+                    color: Colors.lightGreen,
                   );
                 },
               ),

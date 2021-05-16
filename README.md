@@ -1,18 +1,49 @@
+
 # Flutter Lazy ListView
 
   
-
 <p  align="center"><img  src="https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/logo.png"  height="250"  alt="Logo" />
+
+  
 
 [![Build Actions Status](https://github.com/yasaswick/flutter_lazy_listview/workflows/Dart/badge.svg)](https://github.com/yasaswick/flutter_lazy_listview/actions)
 
-
+  
 A light-weight minimalist dart packackage for lazy loading of infinite lists.. (packed with some cool features) Uses dart streams and sliverlists under-the-hood.
 
-## Screenshot
-  
-  <p align="center"><img  src="https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/gif.gif" alt="Screenshot" />
+## Parameters
 
+[Controller]
+This is the default DataFeedController of your data type. This is a required parameter
+
+[onRefresh]
+Async function that needs to be run when a user pulls down on the list. If null; this will disable the pull from top animations.
+
+[noDataBuilder]
+This can be used to build a widget or a placeholder when there is no data.
+
+[emptyListBuilder]
+This can be used to build a widget or a placeholder when the list is empty.
+
+[errorBuilder]
+This can be used to build a widget or a placeholder when there is a error in the list.
+
+[offSet]
+The offset from the bottom where the onReachingend funtion to be called. default is 250.
+
+[onReachingEnd]
+The async function which will be called when the user scrolls towards the end of the list. (depends on the offset as well)
+
+[itemBuilder]
+The default item builder.refer the example
+
+[separatorBuilder]
+The default separator builder. To use this you must use [FlutterLazyListView<YourModel>.separated]
+
+
+## Screenshot
+
+![Lazy loading list](https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/gif.gif)![Pull to Refresh](https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/pull.gif)![Separator Builder](https://raw.githubusercontent.com/yasaswick/flutter_lazy_listview/master/assets/separator.gif)
   
 
 ## Usage
@@ -97,8 +128,9 @@ class _FlutterLazyListViewExampleState
 }
 ```
   
-  
 
 ## Authors
+
+  
 
 Yasas Wickramarathne

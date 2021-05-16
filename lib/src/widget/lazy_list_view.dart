@@ -108,13 +108,14 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
                   onNotification: (info) => _onNotification(info),
                   child: CustomScrollView(
                     slivers: [
-                      CupertinoSliverRefreshControl(
-                        refreshTriggerPullDistance: 100.0,
-                        refreshIndicatorExtent: 60.0,
-                        onRefresh: () async {
-                          await _refreshData();
-                        },
-                      ),
+                      if (widget.onRefresh != null)
+                        CupertinoSliverRefreshControl(
+                          refreshTriggerPullDistance: 100.0,
+                          refreshIndicatorExtent: 60.0,
+                          onRefresh: () async {
+                            await _refreshData();
+                          },
+                        ),
                       SliverPadding(
                         padding: widget.padding,
                         sliver: SliverList(
