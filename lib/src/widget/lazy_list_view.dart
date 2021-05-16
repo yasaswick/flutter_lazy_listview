@@ -16,6 +16,9 @@ class FlutterLazyListView<T> extends StatefulWidget {
   ///Async method to load next page when end is reached
   final Function onReachingEnd;
 
+  ///Async method to load next page when end is reached
+  final Function onRefresh;
+
   ///Offset to use to trigger [onReachEnd] method
   final double offset;
 
@@ -39,6 +42,16 @@ class FlutterLazyListView<T> extends StatefulWidget {
   ///Widget which is displayed when no data is present
   final Widget noDataBuilder;
 
+  ///No data widget builder
+  ///
+  ///Widget which is displayed when no data is present
+  final EdgeInsets padding;
+
+  ///No data widget builder
+  ///
+  ///Widget which is displayed when no data is present
+  final ItemBuilder<T> separatorBuilder;
+
   const FlutterLazyListView(
       {@required this.dataFeedController,
       @required this.itemBuilder,
@@ -47,7 +60,26 @@ class FlutterLazyListView<T> extends StatefulWidget {
       this.progressBuilder,
       this.errorBuilder,
       this.emptyListBuilder,
-      this.noDataBuilder})
+      this.noDataBuilder,
+      this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      this.onRefresh})
+      : separatorBuilder = null,
+        assert(onReachingEnd != null),
+        assert(itemBuilder != null),
+        assert(dataFeedController != null);
+
+  const FlutterLazyListView.separated(
+      {@required this.dataFeedController,
+      @required this.itemBuilder,
+      @required this.onReachingEnd,
+      @required this.separatorBuilder,
+      this.offset = 150,
+      this.progressBuilder,
+      this.errorBuilder,
+      this.emptyListBuilder,
+      this.noDataBuilder,
+      this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      this.onRefresh})
       : assert(onReachingEnd != null),
         assert(itemBuilder != null),
         assert(dataFeedController != null);
@@ -58,6 +90,7 @@ class FlutterLazyListView<T> extends StatefulWidget {
 
 class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
   bool _isRequestCompleted = true;
+  bool _refreshCompleted = true;
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +108,19 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
                   onNotification: (info) => _onNotification(info),
                   child: CustomScrollView(
                     slivers: [
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return _itemBuilder(context, data[index], index);
-                          },
-                          childCount: snapshot.data.length,
-                        ),
+                      CupertinoSliverRefreshControl(
+                        refreshTriggerPullDistance: 100.0,
+                        refreshIndicatorExtent: 60.0,
+                        onRefresh: () async {
+                          await _refreshData();
+                        },
+                      ),
+                      SliverPadding(
+                        padding: widget.padding,
+                        sliver: SliverList(
+                            delegate: _getChildBuilderDelegate(
+                          data: data,
+                        )),
                       ),
                       SliverToBoxAdapter(
                         child: StreamBuilder(
@@ -117,8 +156,29 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
     );
   }
 
-  Widget _itemBuilder(BuildContext context, T data, int index) {
-    return widget.itemBuilder(context, data, index);
+  SliverChildBuilderDelegate _getChildBuilderDelegate({List<T> data}) {
+    if (widget.separatorBuilder == null) {
+      return SliverChildBuilderDelegate((context, index) {
+        return widget.itemBuilder(context, data[index], index);
+      }, childCount: data.length);
+    } else {
+      return SliverChildBuilderDelegate(
+        (context, index) {
+          final itemIndex = index ~/ 2;
+          if (index.isEven) {
+            return widget.itemBuilder(context, data[itemIndex], index);
+          }
+          return widget.separatorBuilder(context, data[itemIndex], index);
+        },
+        childCount: math.max(0, data.length * 2 - 1),
+        semanticIndexCallback: (Widget widget, int localIndex) {
+          if (localIndex.isEven) {
+            return localIndex ~/ 2;
+          }
+          return null;
+        },
+      );
+    }
   }
 
   bool _onNotification(ScrollNotification notification) {
@@ -137,7 +197,7 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
     return false;
   }
 
-  _loadData() async {
+  Future _loadData() async {
     if (_isRequestCompleted) {
       _isRequestCompleted = false;
       widget.dataFeedController.statusSink.add(ConnectionStatus.BUSY);
@@ -145,6 +205,14 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
       await widget.onReachingEnd();
       _isRequestCompleted = true;
       widget.dataFeedController.statusSink.add(ConnectionStatus.COMPLETED);
+    }
+  }
+
+  Future _refreshData() async {
+    if (_refreshCompleted && widget.onRefresh != null) {
+      _refreshCompleted = false;
+      await widget.onRefresh();
+      _refreshCompleted = true;
     }
   }
 }
