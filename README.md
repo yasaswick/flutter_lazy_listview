@@ -40,6 +40,9 @@ The default item builder.refer the example
 [separatorBuilder]
 The default separator builder. To use this you must use [FlutterLazyListView<YourModel>.separated]
 
+[padding]
+Use this to override padding. Default is EdgeInsets.symmetric(horizontal: 10, vertical: 20)
+
 
 ## Screenshot
 
