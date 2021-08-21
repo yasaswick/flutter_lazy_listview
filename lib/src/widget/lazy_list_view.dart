@@ -130,7 +130,7 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
                                     child: widget.progressBuilder ??
                                         CupertinoActivityIndicator(),
                                   );
-                                  break;
+
                                 default:
                                   return Container();
                               }
