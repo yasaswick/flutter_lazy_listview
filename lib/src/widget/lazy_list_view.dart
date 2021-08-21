@@ -17,7 +17,7 @@ class FlutterLazyListView<T> extends StatefulWidget {
   final Function onReachingEnd;
 
   ///Async method to load next page when end is reached
-  final Function onRefresh;
+  final Function? onRefresh;
 
   ///Offset to use to trigger [onReachEnd] method
   final double offset;
@@ -25,22 +25,22 @@ class FlutterLazyListView<T> extends StatefulWidget {
   ///Progress builder;
   ///
   ///Widget which is displayed while the async[onReachEnd] is awaiting
-  final Widget progressBuilder;
+  final Widget? progressBuilder;
 
   ///Error Widget builder;
   ///
   ///Widget which is displayed when there is an error is stream builder
-  final Widget errorBuilder;
+  final Widget? errorBuilder;
 
   ///Empty list widget builder
   ///
   ///Widget which is displayed when list is empty
-  final Widget emptyListBuilder;
+  final Widget? emptyListBuilder;
 
   ///No data widget builder
   ///
   ///Widget which is displayed when no data is present
-  final Widget noDataBuilder;
+  final Widget? noDataBuilder;
 
   ///No data widget builder
   ///
@@ -50,12 +50,12 @@ class FlutterLazyListView<T> extends StatefulWidget {
   ///No data widget builder
   ///
   ///Widget which is displayed when no data is present
-  final ItemBuilder<T> separatorBuilder;
+  final ItemBuilder<T>? separatorBuilder;
 
   const FlutterLazyListView(
-      {@required this.dataFeedController,
-      @required this.itemBuilder,
-      @required this.onReachingEnd,
+      {required this.dataFeedController,
+      required this.itemBuilder,
+      required this.onReachingEnd,
       this.offset = 150,
       this.progressBuilder,
       this.errorBuilder,
@@ -63,26 +63,20 @@ class FlutterLazyListView<T> extends StatefulWidget {
       this.noDataBuilder,
       this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       this.onRefresh})
-      : separatorBuilder = null,
-        assert(onReachingEnd != null),
-        assert(itemBuilder != null),
-        assert(dataFeedController != null);
+      : separatorBuilder = null;
 
   const FlutterLazyListView.separated(
-      {@required this.dataFeedController,
-      @required this.itemBuilder,
-      @required this.onReachingEnd,
-      @required this.separatorBuilder,
+      {required this.dataFeedController,
+      required this.itemBuilder,
+      required this.onReachingEnd,
+      required this.separatorBuilder,
       this.offset = 150,
       this.progressBuilder,
       this.errorBuilder,
       this.emptyListBuilder,
       this.noDataBuilder,
       this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      this.onRefresh})
-      : assert(onReachingEnd != null),
-        assert(itemBuilder != null),
-        assert(dataFeedController != null);
+      this.onRefresh});
 
   @override
   _FlutterLazyListViewState createState() => _FlutterLazyListViewState<T>();
@@ -99,7 +93,7 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
           stream: widget.dataFeedController.dataFeedStream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var data = snapshot.data;
+              var data = snapshot.data!;
               if (data.isEmpty) {
                 return widget.emptyListBuilder ??
                     Center(child: Text('Empty List'));
@@ -157,21 +151,21 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
     );
   }
 
-  SliverChildBuilderDelegate _getChildBuilderDelegate({List<T> data}) {
+  SliverChildBuilderDelegate _getChildBuilderDelegate({List<T>? data}) {
     if (widget.separatorBuilder == null) {
       return SliverChildBuilderDelegate((context, index) {
-        return widget.itemBuilder(context, data[index], index);
-      }, childCount: data.length);
+        return widget.itemBuilder(context, data![index], index);
+      }, childCount: data!.length);
     } else {
       return SliverChildBuilderDelegate(
         (context, index) {
           final itemIndex = index ~/ 2;
           if (index.isEven) {
-            return widget.itemBuilder(context, data[itemIndex], index);
+            return widget.itemBuilder(context, data![itemIndex], index);
           }
-          return widget.separatorBuilder(context, data[itemIndex], index);
+          return widget.separatorBuilder!(context, data![itemIndex], index);
         },
-        childCount: math.max(0, data.length * 2 - 1),
+        childCount: math.max(0, data!.length * 2 - 1),
         semanticIndexCallback: (Widget widget, int localIndex) {
           if (localIndex.isEven) {
             return localIndex ~/ 2;
@@ -212,7 +206,7 @@ class _FlutterLazyListViewState<T> extends State<FlutterLazyListView<T>> {
   Future _refreshData() async {
     if (_refreshCompleted && widget.onRefresh != null) {
       _refreshCompleted = false;
-      await widget.onRefresh();
+      await widget.onRefresh!();
       _refreshCompleted = true;
     }
   }

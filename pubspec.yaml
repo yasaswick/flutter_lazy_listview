@@ -1,10 +1,10 @@
 name: flutter_lazy_listview
 description: A minimalist dart packackage for lazy loading of infinite lists.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/yasaswick/flutter_lazy_listview
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
   flutter: ">=1.17.0"
 
 dependencies:
